@@ -21,20 +21,18 @@ $(document).ready(function() {
     const yaxis = d3.axisLeft().scale(yscale);
     const g_yaxis = g.append('g').attr('class','y axis');
 
-    d3.csv("data/data.csv", function(data) {
-        console.log(data[0]);
+    const educationBorder = 13;
 
-        var groupedData = d3.nest()
-            .key(function(d) { return d.educationNum})
-            .rollup(function(v) { return d3.mean(v, function(d) { return d.hoursPerWeek; })})
-            .sortKeys(function (a,b) { return a - b; })
-            .entries(data);
+    var data;
+    var viewDetails = false;
+    var detailsHighLow = false;
 
-        console.log(groupedData);
-        update(groupedData);
+    d3.csv("data/data.csv", (d) => {
+        data = d;
+        processData();
     });
 
-    function update(new_data) {
+    function updateDiagram(new_data) {
         //update the scales
         xscale.domain([0, d3.max(new_data, (d) => d.value)]);
         yscale.domain(new_data.map((d) => d.key));
@@ -62,8 +60,42 @@ $(document).ready(function() {
 
         rect.merge(rect_enter).select('title').text((d) => d.key);
 
+        rect.merge(rect_enter).on('click', (a,b) => switchView(a, b));
+0
         // EXIT
         // elements that aren't associated with data
         rect.exit().remove();
     }
+
+    function switchView(a, b) {
+        viewDetails = !viewDetails;
+        detailsHighLow = b === 0;
+        processData();
+    }
+
+    function processData() {
+        var groupedData;
+        if(viewDetails) {
+            groupedData = data.filter(d => {
+                if(detailsHighLow) {
+                    return d.educationNum >= educationBorder;
+                } else {
+                    return d.educationNum < educationBorder;
+                }
+            });
+            groupedData = d3.nest()
+                .key(d => d.educationNum)
+                .rollup(v => d3.mean(v, d => d.hoursPerWeek) )
+                .sortKeys((a,b) => a - b )
+                .entries(groupedData);
+        } else {
+            groupedData = d3.nest()
+                .key(d => d.educationNum >= educationBorder ? "High Education" : "Low Education")
+                .rollup(v => d3.mean(v, d => d.hoursPerWeek))
+                .sortKeys( (a,b)=> a - b)
+                .entries(data);
+        }
+        updateDiagram(groupedData);
+    }
+
 });

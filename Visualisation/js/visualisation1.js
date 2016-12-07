@@ -1,5 +1,6 @@
 $(document).ready(function() {
-    const margin = {top: 40, bottom: 10, left: 120, right: 20};
+    const axisMargin = 20;
+    const margin = {top: 40 + axisMargin, bottom: 10, left: 120 + axisMargin, right: 20};
     const width = 800 - margin.left - margin.right;
     const height = 600 - margin.top - margin.bottom;
 
@@ -23,9 +24,9 @@ $(document).ready(function() {
 
     const educationBorder = 13;
 
-    var data;
-    var viewDetails = false;
-    var detailsHighLow = false;
+    let data;
+    let viewDetails = false;
+    let detailsHighLow = false;
 
     d3.csv("data/data.csv", (d) => {
         data = d;
@@ -53,7 +54,7 @@ $(document).ready(function() {
 
         // ENTER + UPDATE
         // both old and new elements
-        rect.merge(rect_enter)
+        rect.merge(rect_enter).transition()
             .attr('height', yscale.bandwidth())
             .attr('width', (d) => xscale(d.value))
             .attr('y', (d) => yscale(d.key));
@@ -61,7 +62,22 @@ $(document).ready(function() {
         rect.merge(rect_enter).select('title').text((d) => d.key);
 
         rect.merge(rect_enter).on('click', (a,b) => switchView(a, b));
-0
+
+        // Add the text label for the x axis
+        svg.append("text")
+            .attr("transform", "translate(" + (width / 2 + margin.left) + " ," + (margin.bottom + axisMargin) + ")")
+            .style("text-anchor", "middle")
+            .text("h / week");
+
+        // Add the text label for the Y axis
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0)
+            .attr("x",0 - (height / 2) - margin.top /2)
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Education level");
+
         // EXIT
         // elements that aren't associated with data
         rect.exit().remove();
@@ -69,12 +85,12 @@ $(document).ready(function() {
 
     function switchView(a, b) {
         viewDetails = !viewDetails;
-        detailsHighLow = b === 0;
+        detailsHighLow = b > 0;
         processData();
     }
 
     function processData() {
-        var groupedData;
+        let groupedData;
         if(viewDetails) {
             groupedData = data.filter(d => {
                 if(detailsHighLow) {
@@ -86,13 +102,13 @@ $(document).ready(function() {
             groupedData = d3.nest()
                 .key(d => d.educationNum)
                 .rollup(v => d3.mean(v, d => d.hoursPerWeek) )
-                .sortKeys((a,b) => a - b )
+                .sortKeys( (a,b)=> a - b)
                 .entries(groupedData);
         } else {
             groupedData = d3.nest()
                 .key(d => d.educationNum >= educationBorder ? "High Education" : "Low Education")
                 .rollup(v => d3.mean(v, d => d.hoursPerWeek))
-                .sortKeys( (a,b)=> a - b)
+                .sortKeys( (a,b)=> a < b)
                 .entries(data);
         }
         updateDiagram(groupedData);

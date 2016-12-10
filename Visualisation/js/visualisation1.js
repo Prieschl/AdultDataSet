@@ -6,8 +6,8 @@ $(document).ready(function() {
 
     // Creates sources <svg> element
     const svg = d3.select('body').append('svg')
-        .attr('width', width+margin.left+margin.right)
-        .attr('height', height+margin.top+margin.bottom);
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom);
 
     // Group used to enforce margin
     const g = svg.append('g')
@@ -49,7 +49,7 @@ $(document).ready(function() {
         // ENTER
         // new elements
         const rect_enter = rect.enter().append('rect')
-            .attr('x', 0)
+            .attr('x', 0);
         rect_enter.append('title');
 
         // ENTER + UPDATE
@@ -61,7 +61,7 @@ $(document).ready(function() {
 
         rect.merge(rect_enter).select('title').text(d => d.key);
 
-        rect.merge(rect_enter).on('click', (a,b) => switchView(a, b));
+        rect.merge(rect_enter).on('click', (a,b) => switchView(b));
 
         // Add the text label for the x axis
         svg.append("text")
@@ -83,7 +83,7 @@ $(document).ready(function() {
         rect.exit().remove();
     }
 
-    function switchView(a, b) {
+    function switchView(b) {
         viewDetails = !viewDetails;
         detailsHighLow = b > 0;
         processData();

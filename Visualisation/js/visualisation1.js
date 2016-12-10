@@ -28,15 +28,15 @@ $(document).ready(function() {
     let viewDetails = false;
     let detailsHighLow = false;
 
-    d3.csv("data/data.csv", (d) => {
+    d3.csv("data/data.csv", d => {
         data = d;
         processData();
     });
 
     function updateDiagram(new_data) {
         //update the scales
-        xscale.domain([0, d3.max(new_data, (d) => d.value)]);
-        yscale.domain(new_data.map((d) => d.key));
+        xscale.domain([0, d3.max(new_data, d => d.value)]);
+        yscale.domain(new_data.map(d => d.key));
         //render the axis
         g_xaxis.call(xaxis);
         g_yaxis.call(yaxis);
@@ -56,10 +56,10 @@ $(document).ready(function() {
         // both old and new elements
         rect.merge(rect_enter).transition()
             .attr('height', yscale.bandwidth())
-            .attr('width', (d) => xscale(d.value))
-            .attr('y', (d) => yscale(d.key));
+            .attr('width', d => xscale(d.value))
+            .attr('y', d => yscale(d.key));
 
-        rect.merge(rect_enter).select('title').text((d) => d.key);
+        rect.merge(rect_enter).select('title').text(d => d.key);
 
         rect.merge(rect_enter).on('click', (a,b) => switchView(a, b));
 

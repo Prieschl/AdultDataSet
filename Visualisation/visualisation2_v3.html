@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="http://getbootstrap.com/examples/justified-nav/justified-nav.css" rel="stylesheet">
+
+    <style>
+        .axis path {
+            fill: none;
+            stroke: #777;
+            shape-rendering: crispEdges;
+        }
+        .axis text {
+            font-size: 13px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="jumbotron">
+
+        <svg id="visualisation" width="1000" height="500"></svg>
+        <!-- TODO: Update Framework from D3 v3 to v4! -->
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <script>
+            d3.csv("data/data.csv", d => {
+                processData(d);
+            });
+
+            function processData(data) {
+                let dataGroup = d3.nest()
+                    .key(d => d.maritalStatus)
+                    .key(d => d.age)
+                    .rollup(v => v.length)
+                    .entries(data);
+                console.log(dataGroup);
+                updateDiagram(dataGroup);
+            }
+
+            function updateDiagram(dataGroup) {
+                let vis = d3.select("#visualisation"),
+                    WIDTH = 1000,
+                    HEIGHT = 500 - 50,
+                    MARGINS = {
+                        top: 20,
+                        right: 20,
+                        bottom: 20,
+                        left: 50
+                    },
+                    xScale = d3.scale.linear()
+                        .range([MARGINS.left, WIDTH - MARGINS.right])
+                        .domain([d3.min(dataGroup, d => d3.min(d.values, d => d.key)),
+                            d3.max(dataGroup, d => d3.max(d.values, d => d.key))]),
+                    yScale = d3.scale.linear()
+                        .range([HEIGHT - MARGINS.top, MARGINS.bottom])
+                        .domain([d3.min(dataGroup, d => d3.min(d.values, d => d.values)),
+                            d3.max(dataGroup, d => d3.max(d.values, d => d.values))]),
+                    xAxis = d3.svg.axis()
+                        .scale(xScale),
+                    yAxis = d3.svg.axis()
+                        .scale(yScale)
+                        .orient("left");
+
+                vis.append("svg:g")
+                    .attr("class", "x axis")
+                    .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+                    .call(xAxis);
+                vis.append("svg:g")
+                    .attr("class", "y axis")
+                    .attr("transform", "translate(" + (MARGINS.left) + ",0)")
+                    .call(yAxis);
+                let lineGen = d3.svg.line()
+                    .x(d => xScale(d.key))
+                    .y(d => yScale(d.values))
+                    .interpolate("basis");
+                let colors = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
+                let lSpace = WIDTH/dataGroup.length;
+                vis.append("text")
+                    .attr("x", (lSpace / 2))
+                    .attr("y", HEIGHT + 20)
+                    .style("fill", "black")
+                    .text("Legend:");
+                dataGroup.forEach((d, i) => {
+                    vis.append('svg:path')
+                        .attr('d', lineGen(d.values))
+                        .attr('stroke', (d, j) => colors[i] )
+                        .attr('stroke-width', 2)
+                        .attr('fill', "none");
+                    // 3 is Married-spouse-absent that is too long, so it is placed more left
+                    vis.append("text")
+                        .attr("x", (lSpace / 2) + i * lSpace - (i===3 ? 50 : 0))
+                        .attr("y", HEIGHT + 40)
+                        .style("fill", colors[i])
+                        .text(d.key);
+                });
+            }
+        </script>
+    </div>
+
+</div>
+
+</body>
+
+</html>

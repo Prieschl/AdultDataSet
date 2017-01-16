@@ -93,6 +93,7 @@ class Visualisation3 {
             .attr("height", this.y.bandwidth())
             .style("fill", d => this.z(d.hoursPerWeek));
 
+        rect.merge(rect_enter).select('title').text(d => d3.format(".4n")(d.hoursPerWeek));
 
         // Add a legend for the color values.
         let legend = this.svg.selectAll(".legend")

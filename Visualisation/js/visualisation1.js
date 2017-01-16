@@ -1,7 +1,7 @@
 class Visualisation1 {
     constructor() {
         this.margin = {top: 50, bottom: 50, left: 120, right: 20};
-        this.width = 500;
+        this.width = 450;
         this.height = 300;
 
         // Creates sources <svg> element

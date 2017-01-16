@@ -1,9 +1,9 @@
 class Visualisation2 {
     constructor() {
-        this.margin = {top: 60, right: 20, bottom: 50, left: 60};
-        this.width = 500 - this.margin.left - this.margin.right;
+        this.margin = {top: 60, right: 120, bottom: 50, left: 60};
+        this.width = 580 - this.margin.left - this.margin.right;
         this.height = 400 - this.margin.top - this.margin.bottom;
-        this.legendMargin = 110;
+        this.legendMargin = 10;
 
         this.svg = d3.select('body').append('svg')
                 .attr('width', this.width + this.margin.left + this.margin.right)
@@ -19,7 +19,7 @@ class Visualisation2 {
         this.g_xaxis = this.svg.append("g")
             .attr("class", "x axis")
             .attr("transform", `translate(0, ${this.height})`);
-        this.yaxis = d3.axisLeft().scale(this.yScale);
+        this.yaxis = d3.axisLeft().scale(this.yScale).tickFormat(d3.format(".0%"));
         this.g_yaxis = this.svg.append("g")
             .attr("class", "y axis");
 
@@ -48,7 +48,7 @@ class Visualisation2 {
             .text("Count People");
 
         this.svg.append("text")
-            .attr("x", this.width - this.legendMargin)
+            .attr("x", this.width + this.legendMargin)
             .attr("y", 0)
             .style("fill", "black")
             .style("font-size", 25)
@@ -76,7 +76,22 @@ class Visualisation2 {
                 data.push({maritalStatus: d1.key, age: d2.key, count: d2.value});
             })
         });
-        this.updateDiagram(data);
+
+        let maritalStatusArray = Array.from(new Set(data.map(d => d.maritalStatus)));
+        let ageArray = Array.from(new Set(data.map(d => d.age)));
+        let relativeData = [];
+        ageArray.forEach(age => {
+            let ageInstances = data.filter(d => d.age == age);
+            let sumAge = d3.sum(ageInstances, d => d.count);
+            maritalStatusArray.forEach(maritalStatus => {
+                let instances = ageInstances.filter(d => d.maritalStatus == maritalStatus);
+                let sum = d3.sum(instances, d => d.count);
+                relativeData.push({maritalStatus: maritalStatus, age: age, portion: sum / sumAge})
+            });
+        });
+
+
+        this.updateDiagram(relativeData);
     }
 
     updateDiagram(data) {
@@ -89,14 +104,14 @@ class Visualisation2 {
         this.xScale.domain([d3.min(data, d => d.age),
             d3.max(data, d => d.age)]);
         this.yScale.domain([0,
-            d3.max(data, d => d.count)]);
+            d3.max(data, d => d.portion)]);
 
         this.g_xaxis.call(this.xaxis);
         this.g_yaxis.call(this.yaxis);
 
         let lineGen = d3.line()
             .x(d => this.xScale(d.age))
-            .y(d => this.yScale(d.count))
+            .y(d => this.yScale(d.portion))
             .curve(d3.curveBasis);
         let colors = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
         let maritalStatusSet = new Set(data.map(d => d.maritalStatus));
@@ -114,7 +129,7 @@ class Visualisation2 {
                 .attr('fill', "none");
             this.svg.append("text")
                 .attr("class", "legendEntry")
-                .attr("x", this.width - this.legendMargin)
+                .attr("x", this.width + this.legendMargin)
                 .attr("y", (i + 1.5) * vSpace)
                 .style("fill", colors[i])
                 .text(d);

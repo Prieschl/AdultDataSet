@@ -1,4 +1,4 @@
-class Visualisation1 {
+class BlockVisualisation {
     constructor() {
         this.margin = {top: 50, bottom: 50, left: 120, right: 20};
         this.width = 450;
@@ -33,8 +33,8 @@ class Visualisation1 {
 
         this.addLabels();
 
-        this.vis2 = new Visualisation2();
-        this.vis3 = new Visualisation3();
+        this.lineVis = new LineVisualisation();
+        this.heatMapVis = new HeatMapVisualisation();
 
         d3.csv("data/data.csv", d => {
             this.origData = d;
@@ -139,8 +139,8 @@ class Visualisation1 {
         }
 
         this.processData(filteredData);
-        this.vis2.processData(filteredData);
-        this.vis3.processData(filteredData);
+        this.heatMapVis.processData(filteredData);
+        this.lineVis.processData(filteredData);
     }
 
     processData(data) {
@@ -163,5 +163,5 @@ class Visualisation1 {
 }
 
 $(document).ready(() => {
-    new Visualisation1();
+    new BlockVisualisation();
 });

@@ -1,4 +1,4 @@
-class Visualisation3 {
+class HeatMapVisualisation {
     constructor() {
         this.margin = {top: 70, right: 90, bottom: 60, left: 120};
         this.width = 700 - this.margin.left - this.margin.right;

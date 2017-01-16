@@ -1,4 +1,4 @@
-class Visualisation2 {
+class LineVisualisation {
     constructor() {
         this.margin = {top: 60, right: 120, bottom: 50, left: 60};
         this.width = 580 - this.margin.left - this.margin.right;

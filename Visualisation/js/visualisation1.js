@@ -40,6 +40,10 @@ class Visualisation1 {
             this.origData = d;
             this.filterData();
         });
+
+        this.removeFiltersBtn = $("#removeFiltersBtn");
+        this.removeFiltersBtn.click(() => this.removeFilters());
+        this.removeFiltersBtn.hide();
     }
 
     addLabels() {
@@ -62,6 +66,13 @@ class Visualisation1 {
             .attr("dy", "1em")
             .style("text-anchor", "middle")
             .text("Education level");
+    }
+
+    removeFilters() {
+        this.viewDetails = false;
+        this.viewSubDetails = false;
+        this.removeFiltersBtn.hide();
+        this.filterData();
     }
 
     updateDiagram(new_data) {
@@ -101,12 +112,12 @@ class Visualisation1 {
 
     switchView(b) {
         if(this.viewSubDetails) {
-            this.viewDetails = false;
-            this.viewSubDetails = false;
+            return;
         } else if(this.viewDetails) {
             this.subDetailsLevel = b + (this.detailsHighLow ? this.educationBorder : 1);
             this.viewSubDetails = true;
         } else {
+            this.removeFiltersBtn.show();
             this.viewDetails = true;
             this.detailsHighLow = b > 0;
         }

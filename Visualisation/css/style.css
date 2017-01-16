@@ -18,3 +18,13 @@ rect:hover {
 .axis {
     font-size: smaller;
 }
+
+#removeFiltersBtn {
+    padding: 10px;
+    margin-left: 20px;
+    margin-top: 20px;
+    position: absolute;
+    border-color: white;
+    background-color: #cc2a2a;
+    color: white;
+}

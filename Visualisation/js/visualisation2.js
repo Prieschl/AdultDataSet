@@ -1,8 +1,8 @@
 class Visualisation2 {
     constructor() {
-        this.margin = {top: 20, right: 20, bottom: 50, left: 60};
-        this.width = 400;
-        this.height = 250;
+        this.margin = {top: 60, right: 20, bottom: 50, left: 60};
+        this.width = 500 - this.margin.left - this.margin.right;
+        this.height = 400 - this.margin.top - this.margin.bottom;
         this.legendMargin = 110;
 
         this.svg = d3.select('body').append('svg')
@@ -27,9 +27,14 @@ class Visualisation2 {
     }
 
     addLabels() {
+        this.svg.append("text")
+            .attr("transform", `translate(${this.width / 2 }, -40)`)
+            .style("text-anchor", "middle")
+            .text("Marital Status vs Age");
+
         // Add the text label for the x axis
         this.svg.append("text")
-            .attr("transform", `translate(${this.width / 2}, ${this.height + this.margin.top + 20})`)
+            .attr("transform", `translate(${this.width / 2}, ${this.height + 40})`)
             .style("text-anchor", "middle")
             .text("Age");
 

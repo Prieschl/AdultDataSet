@@ -1,6 +1,6 @@
 class Visualisation3 {
     constructor() {
-        this.margin = {top: 20, right: 90, bottom: 60, left: 120};
+        this.margin = {top: 70, right: 90, bottom: 60, left: 120};
         this.width = 700 - this.margin.left - this.margin.right;
         this.height = 400 - this.margin.top - this.margin.bottom;
 
@@ -26,6 +26,11 @@ class Visualisation3 {
     }
 
     addLabels() {
+        this.svg.append("text")
+            .attr("transform", `translate(${this.width / 2}, -20)`)
+            .style("text-anchor", "middle")
+            .text("Relationship vs Education vs Working Hours per Week");
+
         this.svg.append("text")
             .attr("class", "label")
             .attr("x", this.width + 20)

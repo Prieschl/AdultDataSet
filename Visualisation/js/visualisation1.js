@@ -1,9 +1,8 @@
 class Visualisation1 {
     constructor() {
-        this.axisMargin = 20;
-        this.margin = {top: 40 + this.axisMargin, bottom: 10, left: 120 + this.axisMargin, right: 20};
+        this.margin = {top: 50, bottom: 50, left: 140, right: 20};
         this.width = 500;
-        this.height = 250;
+        this.height = 300;
 
         // Creates sources <svg> element
         this.svg = d3.select('body').append('svg')
@@ -18,8 +17,9 @@ class Visualisation1 {
         this.xscale = d3.scaleLinear().range([0, this.width]);
         this.yscale = d3.scaleBand().rangeRound([0, this.height]).paddingInner(0.1);
 
-        this.xaxis = d3.axisTop().scale(this.xscale);
-        this.g_xaxis = this.g.append('g').attr('class', 'x axis');
+        this.xaxis = d3.axisBottom().scale(this.xscale);
+        this.g_xaxis = this.g.append('g').attr('class', 'x axis')
+            .attr("transform", `translate(0, ${this.height})`);
         this.yaxis = d3.axisLeft().scale(this.yscale);
         this.g_yaxis = this.g.append('g').attr('class', 'y axis');
 
@@ -40,9 +40,14 @@ class Visualisation1 {
     }
 
     addLabels() {
+        this.svg.append("text")
+            .attr("transform", `translate(${this.width / 2 + this.margin.left}, ${this.margin.top/2})`)
+            .style("text-anchor", "middle")
+            .text("Education vs Working Hours per Week");
+
         // Add the text label for the x axis
         this.svg.append("text")
-            .attr("transform", `translate(${this.width / 2 + this.margin.left}, ${this.margin.bottom + this.axisMargin})`)
+            .attr("transform", `translate(${this.width / 2 + this.margin.left}, ${this.height + this.margin.top + 40})`)
             .style("text-anchor", "middle")
             .text("h / week");
 

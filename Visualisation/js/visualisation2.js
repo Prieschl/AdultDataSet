@@ -51,7 +51,7 @@ class Visualisation2 {
             .attr("x", this.width + this.legendMargin)
             .attr("y", 0)
             .style("fill", "black")
-            .style("font-size", 25)
+            .style("font-size", 20)
             .text("Legend:");
     }
 
@@ -116,7 +116,7 @@ class Visualisation2 {
         let colors = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
         let maritalStatusSet = new Set(data.map(d => d.maritalStatus));
         let martialStatusArray = Array.from(maritalStatusSet).sort();
-        let vSpace = 20;
+        let vSpace = 18;
 
         martialStatusArray.forEach((d, i) => {
             let mData = data.filter(da => da.maritalStatus == d).sort((a, b) => a.age - b.age);

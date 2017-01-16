@@ -25,6 +25,8 @@ $(document).ready(function() {
 
     function processData(new_data) {
         // Group the age by 5 year intervals
+        // Group all kinds of married to one
+        // Calculate number of related entries
         let dataGroup = d3.nest()
             .key(d => {
                 if(d.maritalStatus.startsWith("Married")){

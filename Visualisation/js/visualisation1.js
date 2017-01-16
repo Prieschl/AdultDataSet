@@ -1,50 +1,73 @@
-$(document).ready(function() {
-    const axisMargin = 20;
-    const margin = {top: 40 + axisMargin, bottom: 10, left: 120 + axisMargin, right: 20};
-    const width = 800 - margin.left - margin.right;
-    const height = 600 - margin.top - margin.bottom;
+class Visualisation1 {
+    constructor() {
+        this.axisMargin = 20;
+        this.margin = {top: 40 + this.axisMargin, bottom: 10, left: 120 + this.axisMargin, right: 20};
+        this.width = 500;
+        this.height = 250;
 
-    // Creates sources <svg> element
-    const svg = d3.select('body').append('svg')
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom);
+        // Creates sources <svg> element
+        this.svg = d3.select('body').append('svg')
+            .attr('width', this.width + this.margin.left + this.margin.right)
+            .attr('height', this.height + this.margin.top + this.margin.bottom);
 
-    // Group used to enforce margin
-    const g = svg.append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`);
+        // Group used to enforce margin
+        this.g = this.svg.append('g')
+            .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
 
-    // Scales setup
-    const xscale = d3.scaleLinear().range([0, width]);
-    const yscale = d3.scaleBand().rangeRound([0, height]).paddingInner(0.1);
+        // Scales setup
+        this.xscale = d3.scaleLinear().range([0, this.width]);
+        this.yscale = d3.scaleBand().rangeRound([0, this.height]).paddingInner(0.1);
 
-    const xaxis = d3.axisTop().scale(xscale);
-    const g_xaxis = g.append('g').attr('class','x axis');
-    const yaxis = d3.axisLeft().scale(yscale);
-    const g_yaxis = g.append('g').attr('class','y axis');
+        this.xaxis = d3.axisTop().scale(this.xscale);
+        this.g_xaxis = this.g.append('g').attr('class', 'x axis');
+        this.yaxis = d3.axisLeft().scale(this.yscale);
+        this.g_yaxis = this.g.append('g').attr('class', 'y axis');
 
-    const educationBorder = 13;
+        this.educationBorder = 13;
 
-    let data;
-    let viewDetails = false;
-    let detailsHighLow = false;
+        this.viewDetails = false;
+        this.detailsHighLow = false;
 
-    d3.csv("data/data.csv", d => {
-        data = d;
-        processData();
-    });
+        this.addLabels();
 
-    function updateDiagram(new_data) {
+        this.vis2 = new Visualisation2();
+        this.vis3 = new Visualisation3();
+
+        d3.csv("data/data.csv", d => {
+            this.origData = d;
+            this.filterData();
+        });
+    }
+
+    addLabels() {
+        // Add the text label for the x axis
+        this.svg.append("text")
+            .attr("transform", `translate(${this.width / 2 + this.margin.left}, ${this.margin.bottom + this.axisMargin})`)
+            .style("text-anchor", "middle")
+            .text("h / week");
+
+        // Add the text label for the Y axis
+        this.svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0)
+            .attr("x", 0 - (this.height / 2) - this.margin.top / 2)
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Education level");
+    }
+
+    updateDiagram(new_data) {
         //update the scales
-        xscale.domain([0, d3.max(new_data, d => d.value)]);
-        yscale.domain(new_data.map(d => d.key));
+        this.xscale.domain([0, d3.max(new_data, d => d.value)]);
+        this.yscale.domain(new_data.map(d => d.key));
         //render the axis
-        g_xaxis.call(xaxis);
-        g_yaxis.call(yaxis);
+        this.g_xaxis.call(this.xaxis);
+        this.g_yaxis.call(this.yaxis);
 
         // Render the chart with new data
 
         // DATA JOIN
-        const rect = g.selectAll('rect').data(new_data);
+        const rect = this.g.selectAll('rect').data(new_data);
 
         // ENTER
         // new elements
@@ -55,63 +78,61 @@ $(document).ready(function() {
         // ENTER + UPDATE
         // both old and new elements
         rect.merge(rect_enter).transition()
-            .attr('height', yscale.bandwidth())
-            .attr('width', d => xscale(d.value))
-            .attr('y', d => yscale(d.key));
+            .attr('height', this.yscale.bandwidth())
+            .attr('width', d => this.xscale(d.value))
+            .attr('y', d => this.yscale(d.key));
 
         rect.merge(rect_enter).select('title').text(d => d.key);
 
-        rect.merge(rect_enter).on('click', (a,b) => switchView(b));
-
-        // Add the text label for the x axis
-        svg.append("text")
-            .attr("transform", "translate(" + (width / 2 + margin.left) + " ," + (margin.bottom + axisMargin) + ")")
-            .style("text-anchor", "middle")
-            .text("h / week");
-
-        // Add the text label for the Y axis
-        svg.append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 0)
-            .attr("x",0 - (height / 2) - margin.top /2)
-            .attr("dy", "1em")
-            .style("text-anchor", "middle")
-            .text("Education level");
+        rect.merge(rect_enter).on('click', (a, b) => this.switchView(b));
 
         // EXIT
         // elements that aren't associated with data
         rect.exit().remove();
     }
 
-    function switchView(b) {
-        viewDetails = !viewDetails;
-        detailsHighLow = b > 0;
-        processData();
+    switchView(b) {
+        this.viewDetails = !this.viewDetails;
+        this.detailsHighLow = b > 0;
+        this.filterData(this.origData);
     }
 
-    function processData() {
-        let groupedData;
-        if(viewDetails) {
-            groupedData = data.filter(d => {
-                if(detailsHighLow) {
-                    return d.educationNum >= educationBorder;
+    filterData() {
+        let filteredData = this.origData;
+        if (this.viewDetails) {
+            filteredData = filteredData.filter(d => {
+                if (this.detailsHighLow) {
+                    return d.educationNum >= this.educationBorder;
                 } else {
-                    return d.educationNum < educationBorder;
+                    return d.educationNum < this.educationBorder;
                 }
             });
-            groupedData = d3.nest()
-                .key(d => d.educationNum)
-                .rollup(v => d3.mean(v, d => d.hoursPerWeek) )
-                .sortKeys( (a,b)=> a - b)
-                .entries(groupedData);
-        } else {
-            groupedData = d3.nest()
-                .key(d => d.educationNum >= educationBorder ? "High Education" : "Low Education")
-                .rollup(v => d3.mean(v, d => d.hoursPerWeek))
-                .sortKeys( (a,b)=> a < b)
-                .entries(data);
         }
-        updateDiagram(groupedData);
+
+        this.processData(filteredData);
+        this.vis2.processData(filteredData);
+        this.vis3.processData(filteredData);
     }
 
+    processData(data) {
+        let groupedData;
+        if (this.viewDetails) {
+            groupedData = d3.nest()
+                .key(d => d.educationNum)
+                .rollup(v => d3.mean(v, d => d.hoursPerWeek))
+                .sortKeys((a, b) => a - b)
+                .entries(data);
+        } else {
+            groupedData = d3.nest()
+                .key(d => d.educationNum >= this.educationBorder ? "High Education" : "Low Education")
+                .rollup(v => d3.mean(v, d => d.hoursPerWeek))
+                .sortKeys((a, b) => a < b)
+                .entries(data);
+        }
+        this.updateDiagram(groupedData);
+    }
+}
+
+$(document).ready(() => {
+    new Visualisation1();
 });

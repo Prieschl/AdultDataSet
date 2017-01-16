@@ -27,6 +27,9 @@ class Visualisation1 {
 
         this.viewDetails = false;
         this.detailsHighLow = false;
+        this.viewSubDetails = false;
+        this.subDetailsLevel = 0;
+
 
         this.addLabels();
 
@@ -97,14 +100,24 @@ class Visualisation1 {
     }
 
     switchView(b) {
-        this.viewDetails = !this.viewDetails;
-        this.detailsHighLow = b > 0;
-        this.filterData(this.origData);
+        if(this.viewSubDetails) {
+            this.viewDetails = false;
+            this.viewSubDetails = false;
+        } else if(this.viewDetails) {
+            this.subDetailsLevel = b + (this.detailsHighLow ? this.educationBorder : 1);
+            this.viewSubDetails = true;
+        } else {
+            this.viewDetails = true;
+            this.detailsHighLow = b > 0;
+        }
+        this.filterData();
     }
 
     filterData() {
         let filteredData = this.origData;
-        if (this.viewDetails) {
+        if(this.viewSubDetails) {
+            filteredData = filteredData.filter(d => d.educationNum == this.subDetailsLevel);
+        } else if (this.viewDetails) {
             filteredData = filteredData.filter(d => {
                 if (this.detailsHighLow) {
                     return d.educationNum >= this.educationBorder;

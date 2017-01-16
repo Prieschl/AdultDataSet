@@ -9,9 +9,15 @@ $(document).ready(function() {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    d3.csv("data/data.csv", function(error, rawData) {
-        if (error) throw error;
+    let x = d3.scaleBand().range([0, width]).paddingInner(0.01),
+        y = d3.scaleBand().range([height, 0]).paddingInner(0.01),
+        z = d3.scaleSequential(d3["interpolateYlOrRd"]);
 
+    d3.csv("data/data.csv", data => {
+        processData(data);
+    });
+
+    function processData(rawData) {
         let agregatedData = d3.nest()
             .key(d => d.educationNum)
             .sortKeys((a,b) => a-b)
@@ -20,23 +26,20 @@ $(document).ready(function() {
             .entries(rawData);
 
         let data = [];
-        agregatedData.forEach(ded => {
-            ded.values.forEach(red => {
-                data.push({educationNum:ded.key, relationship:red.key, hoursPerWeek:red.value});
+        agregatedData.forEach(d1 => {
+            d1.values.forEach(d2 => {
+                data.push({educationNum:d1.key, relationship:d2.key, hoursPerWeek:d2.value});
             })
         });
+        updateDiagram(data);
+    }
 
-        let x = d3.scaleBand().range([0, width]).paddingInner(0.01),
-            y = d3.scaleBand().range([height, 0]).paddingInner(0.01),
-            z = d3.scaleSequential(d3["interpolateYlOrRd"]);
-
+    function updateDiagram(data) {
         // Compute the scale domains.
         x.domain(data.map(d => d.educationNum));
         y.domain(data.map(d => d.relationship));
         z.domain([0, d3.max(data, d => d.hoursPerWeek)]);
 
-        // Display the tiles for each non-zero bucket.
-        // See http://bl.ocks.org/3074470 for an alternative implementation.
         svg.selectAll(".tile")
             .data(data)
             .enter().append("rect")
@@ -75,10 +78,10 @@ $(document).ready(function() {
         svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom().scale(x))
+            .call(d3.axisBottom().scale(x));
 
         svg.append("g")
             .attr("class", "y axis")
             .call(d3.axisLeft().scale(y));
-    });
+    }
 });

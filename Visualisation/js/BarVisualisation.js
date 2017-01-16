@@ -1,4 +1,4 @@
-class BlockVisualisation {
+class BarVisualisation {
     constructor() {
         this.margin = {top: 50, bottom: 50, left: 120, right: 20};
         this.width = 450;
@@ -163,5 +163,5 @@ class BlockVisualisation {
 }
 
 $(document).ready(() => {
-    new BlockVisualisation();
+    new BarVisualisation();
 });

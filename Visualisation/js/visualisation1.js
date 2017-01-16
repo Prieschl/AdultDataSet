@@ -43,13 +43,13 @@ class Visualisation1 {
         this.svg.append("text")
             .attr("transform", `translate(${this.width / 2 + this.margin.left}, ${this.margin.top/2})`)
             .style("text-anchor", "middle")
-            .text("Education vs Working Hours per Week");
+            .text("Education vs Percentage with income > 50.000$ / year");
 
         // Add the text label for the x axis
         this.svg.append("text")
             .attr("transform", `translate(${this.width / 2 + this.margin.left}, ${this.height + this.margin.top + 40})`)
             .style("text-anchor", "middle")
-            .text("h / week");
+            .text("income > 50.000$ [%]");
 
         // Add the text label for the Y axis
         this.svg.append("text")
@@ -124,13 +124,13 @@ class Visualisation1 {
         if (this.viewDetails) {
             groupedData = d3.nest()
                 .key(d => d.educationNum)
-                .rollup(v => d3.mean(v, d => d.hoursPerWeek))
+                .rollup(v => d3.mean(v, d => d.income))
                 .sortKeys((a, b) => a - b)
                 .entries(data);
         } else {
             groupedData = d3.nest()
                 .key(d => d.educationNum >= this.educationBorder ? "High Education" : "Low Education")
-                .rollup(v => d3.mean(v, d => d.hoursPerWeek))
+                .rollup(v => d3.mean(v, d => d.income))
                 .sortKeys((a, b) => a < b)
                 .entries(data);
         }

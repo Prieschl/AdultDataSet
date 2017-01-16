@@ -2,8 +2,8 @@ $(document).ready(function() {
     const margin = {
         top: 20,
         right: 20,
-        bottom: 20,
-        left: 50
+        bottom: 50,
+        left: 60
     };
     const width = 1000;
     const height =  600;
@@ -80,6 +80,21 @@ $(document).ready(function() {
                 .style("fill", colors[i])
                 .text(d);
         });
+
+        // Add the text label for the x axis
+        svg.append("text")
+            .attr("transform", `translate(${width/2}, ${height + margin.top + 20})`)
+            .style("text-anchor", "middle")
+            .text("Age");
+
+        // Add the text label for the Y axis
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", - 60)
+            .attr("x",0 - (height / 2) - margin.top /2)
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Count People");
 
         svg.append("g")
             .attr("class", "y axis")

@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    const margin = {top: 20, right: 90, bottom: 30, left: 100},
+    const margin = {top: 20, right: 90, bottom: 60, left: 120},
         width = 960 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
@@ -73,7 +73,22 @@ $(document).ready(function() {
             .attr("x", width + 20)
             .attr("y", 10)
             .attr("dy", ".35em")
-            .text("Count");
+            .text("h / week");
+
+        // Add the text label for the x axis
+        svg.append("text")
+            .attr("transform", `translate(${width/2}, ${height + margin.top + 20})`)
+            .style("text-anchor", "middle")
+            .text("Education Level");
+
+        // Add the text label for the Y axis
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", - 120)
+            .attr("x",0 - (height / 2) - margin.top /2)
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Relationship");
 
         svg.append("g")
             .attr("class", "x axis")

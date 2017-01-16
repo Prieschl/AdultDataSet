@@ -102,10 +102,12 @@ class HeatMapVisualisation {
             .attr("class", "legend")
             .attr("transform", (d, i) => "translate(" + (this.width + 20) + "," + (20 + i * 20) + ")");
         legend.append("rect")
+            .attr("class", "legend")
             .attr("width", 20)
             .attr("height", 20)
             .style("fill", this.z);
         legend.append("text")
+            .attr("class", "legend")
             .attr("x", 26)
             .attr("y", 10)
             .attr("dy", ".35em")

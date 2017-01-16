@@ -1,6 +1,6 @@
 class Visualisation1 {
     constructor() {
-        this.margin = {top: 50, bottom: 50, left: 140, right: 20};
+        this.margin = {top: 50, bottom: 50, left: 120, right: 20};
         this.width = 500;
         this.height = 300;
 
@@ -17,7 +17,7 @@ class Visualisation1 {
         this.xscale = d3.scaleLinear().range([0, this.width]);
         this.yscale = d3.scaleBand().rangeRound([0, this.height]).paddingInner(0.1);
 
-        this.xaxis = d3.axisBottom().scale(this.xscale);
+        this.xaxis = d3.axisBottom().scale(this.xscale).tickFormat(d3.format(".0%"));
         this.g_xaxis = this.g.append('g').attr('class', 'x axis')
             .attr("transform", `translate(0, ${this.height})`);
         this.yaxis = d3.axisLeft().scale(this.yscale);
@@ -49,7 +49,7 @@ class Visualisation1 {
         this.svg.append("text")
             .attr("transform", `translate(${this.width / 2 + this.margin.left}, ${this.height + this.margin.top + 40})`)
             .style("text-anchor", "middle")
-            .text("income > 50.000$ [%]");
+            .text("people with income > 50.000$");
 
         // Add the text label for the Y axis
         this.svg.append("text")
@@ -87,7 +87,7 @@ class Visualisation1 {
             .attr('width', d => this.xscale(d.value))
             .attr('y', d => this.yscale(d.key));
 
-        rect.merge(rect_enter).select('title').text(d => d.key);
+        rect.merge(rect_enter).select('title').text(d => d3.format(".2%")(d.value));
 
         rect.merge(rect_enter).on('click', (a, b) => this.switchView(b));
 
@@ -129,7 +129,7 @@ class Visualisation1 {
                 .entries(data);
         } else {
             groupedData = d3.nest()
-                .key(d => d.educationNum >= this.educationBorder ? "High Education" : "Low Education")
+                .key(d => d.educationNum >= this.educationBorder ? `High (>=${this.educationBorder})` : `Low (<${this.educationBorder})`)
                 .rollup(v => d3.mean(v, d => d.income))
                 .sortKeys((a, b) => a < b)
                 .entries(data);

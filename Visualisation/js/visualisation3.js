@@ -40,7 +40,7 @@ class Visualisation3 {
 
         // Add the text label for the x axis
         this.svg.append("text")
-            .attr("transform", `translate(${this.width / 2}, ${this.height + this.margin.top + 20})`)
+            .attr("transform", `translate(${this.width / 2}, ${this.height + 40})`)
             .style("text-anchor", "middle")
             .text("Education Level");
 
@@ -84,6 +84,7 @@ class Visualisation3 {
         let rect = this.svg.selectAll('.tile').data(data);
 
         let rect_enter = rect.enter().append('rect');
+        rect_enter.append('title');
         rect.merge(rect_enter)
             .attr("class", "tile")
             .attr("x", d => this.x(d.educationNum))
@@ -91,6 +92,7 @@ class Visualisation3 {
             .attr("width", this.x.bandwidth())
             .attr("height", this.y.bandwidth())
             .style("fill", d => this.z(d.hoursPerWeek));
+
 
         // Add a legend for the color values.
         let legend = this.svg.selectAll(".legend")
